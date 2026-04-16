@@ -1,0 +1,71 @@
+# =========================
+# Symfony / PHP
+# =========================
+/vendor/
+/var/
+/public/bundles/
+/public/build/
+/public/uploads/
+
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Symfony cache & logs
+/var/cache/
+/var/log/
+/var/sessions/
+
+# =========================
+# Composer
+# =========================
+composer.phar
+
+# =========================
+# Node / Frontend (Vue, Vite, Webpack)
+# =========================
+node_modules/
+/npm-debug.log
+/yarn-error.log
+/.npm
+/.yarn
+
+/dist/
+/public/dist/
+/public/hot
+
+# Vite / Webpack Encore
+/.vite/
+/.well-known/
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+*.iml
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# PHPUnit / testing
+# =========================
+/coverage/
+/.phpunit.result.cache
+
+# =========================
+# Docker (si aplica)
+# =========================
+docker-compose.override.yml
+
+# =========================
+# Logs / dumps
+# =========================
+*.log
+*.sql
+*.dump
