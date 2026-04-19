@@ -11,6 +11,24 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
+/* se define indices para optimizar consultas, para mejorar el rendimiento, para patrones mas usados */
+#[ORM\Table(
+    indexes: [
+        new ORM\Index(
+            name: 'idx_report_filters',
+            columns: ['created_at', 'status', 'priority']
+        ),
+        new ORM\Index(
+            name: 'idx_task_assigned_to',
+            columns: ['assigned_to_id']
+        ),
+        new ORM\Index(
+            name: 'idx_task_due_date',
+            columns: ['due_date']
+        )
+    ]
+)]
+
 #[ORM\HasLifecycleCallbacks]
 class Task
 {

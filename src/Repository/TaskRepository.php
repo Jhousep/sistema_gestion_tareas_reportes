@@ -154,6 +154,15 @@ class TaskRepository extends ServiceEntityRepository
         // ordenamos por fecha de creación
         $qb->orderBy('t.createdAt', 'DESC');
 
+        /*
+        // obtenemos la consulta para el explain
+        $query = $qb->getQuery();
+        $sql = $query->getSQL();
+        $params = $query->getParameters();
+
+        dd($sql, $params);
+        */
+
         // ejecutamos la consulta
         return $qb->getQuery()->getResult();
     }
