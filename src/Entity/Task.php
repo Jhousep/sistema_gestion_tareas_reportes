@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Enum\TaskStatus;
 use App\Enum\TaskPriority;
-
 use App\Repository\TaskRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,6 +11,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Task
 {
     #[ORM\Id]
@@ -34,6 +34,12 @@ class Task
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $dueDate = null;
 
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    private \DateTimeImmutable $createdAt;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+
     /**
      * @var Collection<int, Category>
      */
@@ -44,6 +50,24 @@ class Task
     #[ORM\JoinColumn(nullable: false)]
     private User $assignedTo;
 
+    public function __construct()
+    {
+        $this->categories = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
     public function getAssignedTo(): User
     {
         return $this->assignedTo;
@@ -53,11 +77,6 @@ class Task
     {
         $this->assignedTo = $assignedTo;
         return $this;
-    }
-
-    public function __construct()
-    {
-        $this->categories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -73,7 +92,6 @@ class Task
     public function setTitle(string $title): static
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -85,7 +103,6 @@ class Task
     public function setDescription(?string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -97,7 +114,6 @@ class Task
     public function setStatus(TaskStatus $status): static
     {
         $this->status = $status;
-
         return $this;
     }
 
@@ -109,7 +125,6 @@ class Task
     public function setPriority(TaskPriority $priority): static
     {
         $this->priority = $priority;
-
         return $this;
     }
 
@@ -121,7 +136,28 @@ class Task
     public function setDueDate(?\DateTimeImmutable $dueDate): static
     {
         $this->dueDate = $dueDate;
+        return $this;
+    }
 
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
         return $this;
     }
 

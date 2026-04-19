@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use App\Entity\Task;
-use App\Entity\User;
 use App\Enum\TaskStatus;
 use App\Enum\TaskPriority;
 use App\Repository\TaskRepository;

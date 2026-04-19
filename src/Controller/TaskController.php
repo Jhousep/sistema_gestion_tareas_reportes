@@ -33,6 +33,8 @@ class TaskController
                 'status' => $task->getStatus()->value,
                 'priority' => $task->getPriority()->value,
                 'dueDate' => $task->getDueDate()?->format('Y-m-d'),
+                'createdAt' => $task->getCreatedAt()?->format('Y-m-d H:i:s'),
+                'updatedAt' => $task->getUpdatedAt()?->format('Y-m-d H:i:s'),
                 'assignedTo' => $task->getAssignedTo()->getEmail(),
             ];
         }, $tasks);
@@ -54,6 +56,8 @@ class TaskController
                 'status' => $task->getStatus()->value,
                 'priority' => $task->getPriority()->value,
                 'dueDate' => $task->getDueDate()?->format('Y-m-d'),
+                'createdAt' => $task->getCreatedAt()?->format('Y-m-d H:i:s'),
+                'updatedAt' => $task->getUpdatedAt()?->format('Y-m-d H:i:s'),
                 'assignedTo' => $task->getAssignedTo()->getEmail(),
                 'categories' => array_map(
                     fn($c) => $c->getName(),
