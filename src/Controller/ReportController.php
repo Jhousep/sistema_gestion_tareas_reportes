@@ -25,12 +25,14 @@ class ReportController
 
         // fecha de creación desde
         if ($request->query->get('createdFrom')) {
-            $filters->createdFrom = new \DateTimeImmutable($request->query->get('createdFrom'));
+            $filters->createdFrom = (new \DateTimeImmutable($request->query->get('createdFrom')))
+                ->setTime(0, 0, 0);
         }
 
         // fecha de creación hasta
         if ($request->query->get('createdTo')) {
-            $filters->createdTo = new \DateTimeImmutable($request->query->get('createdTo'));
+            $filters->createdTo = (new \DateTimeImmutable($request->query->get('createdTo')))
+                ->setTime(23, 59, 59);
         }
 
         // fecha de vencimiento desde
@@ -79,12 +81,16 @@ class ReportController
     {
         $filters = new TaskReportFilterDTO();
 
+        // fecha de creación desde
         if ($request->query->get('createdFrom')) {
-            $filters->createdFrom = new \DateTimeImmutable($request->query->get('createdFrom'));
+            $filters->createdFrom = (new \DateTimeImmutable($request->query->get('createdFrom')))
+                ->setTime(0, 0, 0);
         }
 
+        // fecha de creación hasta
         if ($request->query->get('createdTo')) {
-            $filters->createdTo = new \DateTimeImmutable($request->query->get('createdTo'));
+            $filters->createdTo = (new \DateTimeImmutable($request->query->get('createdTo')))
+                ->setTime(23, 59, 59);
         }
 
         if ($request->query->get('dueFrom')) {
@@ -129,12 +135,16 @@ class ReportController
     {
         $filters = new TaskReportFilterDTO();
 
+        // fecha de creación desde
         if ($request->query->get('createdFrom')) {
-            $filters->createdFrom = new \DateTimeImmutable($request->query->get('createdFrom'));
+            $filters->createdFrom = (new \DateTimeImmutable($request->query->get('createdFrom')))
+                ->setTime(0, 0, 0);
         }
 
+        // fecha de creación hasta
         if ($request->query->get('createdTo')) {
-            $filters->createdTo = new \DateTimeImmutable($request->query->get('createdTo'));
+            $filters->createdTo = (new \DateTimeImmutable($request->query->get('createdTo')))
+                ->setTime(23, 59, 59);
         }
 
         if ($request->query->get('status')) {

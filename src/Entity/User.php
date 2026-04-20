@@ -53,6 +53,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->tasks = new ArrayCollection();
     }
 
+    #[ORM\Column(nullable: true)]
+    private ?string $resetToken = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $resetTokenExpiresAt = null;
+
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
@@ -132,6 +138,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getTasks(): Collection
     {
         return $this->tasks;
+    }
+
+    public function getResetToken(): ?string
+{
+    return $this->resetToken;
+}
+
+    public function setResetToken(?string $token): static
+    {
+        $this->resetToken = $token;
+        return $this;
+    }
+
+    public function getResetTokenExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->resetTokenExpiresAt;
+    }
+
+    public function setResetTokenExpiresAt(?\DateTimeImmutable $date): static
+    {
+        $this->resetTokenExpiresAt = $date;
+        return $this;
     }
 
     #[\Deprecated]

@@ -6,6 +6,7 @@ use App\Service\TaskService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/tasks')]
 class TaskController
@@ -30,12 +31,21 @@ class TaskController
             return [
                 'id' => $task->getId(),
                 'title' => $task->getTitle(),
+                'description' => $task->getDescription(),
                 'status' => $task->getStatus()->value,
                 'priority' => $task->getPriority()->value,
                 'dueDate' => $task->getDueDate()?->format('Y-m-d'),
                 'createdAt' => $task->getCreatedAt()?->format('Y-m-d H:i:s'),
                 'updatedAt' => $task->getUpdatedAt()?->format('Y-m-d H:i:s'),
-                'assignedTo' => $task->getAssignedTo()->getEmail(),
+                'assignedToId' => $task->getAssignedTo()->getId(),
+                'assignedToEmail' => $task->getAssignedTo()->getEmail(),
+                'categories' => array_map(
+                    fn($c) => [
+                        'id' => $c->getId(),
+                        'name' => $c->getName()
+                    ],
+                    $task->getCategories()->toArray()
+                )
             ];
         }, $tasks);
 
@@ -58,9 +68,12 @@ class TaskController
                 'dueDate' => $task->getDueDate()?->format('Y-m-d'),
                 'createdAt' => $task->getCreatedAt()?->format('Y-m-d H:i:s'),
                 'updatedAt' => $task->getUpdatedAt()?->format('Y-m-d H:i:s'),
-                'assignedTo' => $task->getAssignedTo()->getEmail(),
+                'assignedTo' => $task->getAssignedTo()->getId(),
                 'categories' => array_map(
-                    fn($c) => $c->getName(),
+                    fn($c) => [
+                        'id' => $c->getId(),
+                        'name' => $c->getName()
+                    ],
                     $task->getCategories()->toArray()
                 )
             ]);
@@ -73,6 +86,7 @@ class TaskController
     }
 
     // crear una tarea
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('', name: 'task_create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
@@ -95,6 +109,7 @@ class TaskController
     }
 
     // actualizar tarea
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}', name: 'task_update', methods: ['PUT'])]
     public function update(int $id, Request $request): JsonResponse
     {
@@ -115,6 +130,7 @@ class TaskController
     }
 
     // eliminar tarea
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}', name: 'task_delete', methods: ['DELETE'])]
     public function delete(int $id): JsonResponse
     {

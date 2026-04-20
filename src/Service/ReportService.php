@@ -19,6 +19,30 @@ class ReportService
         return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
+    // =====================
+    // FORMATTERS (solo para exportaciones)
+    // =====================
+    private function formatStatus(string $status): string
+    {
+        return match ($status) {
+            'pending' => 'Pendiente',
+            'in_progress' => 'En progreso',
+            'completed' => 'Completada',
+            default => $status
+        };
+    }
+
+    private function formatPriority(string $priority): string
+    {
+        return match ($priority) {
+            'low' => 'Baja',
+            'medium' => 'Media',
+            'high' => 'Alta',
+            default => $priority
+        };
+    }
+
+
     public function getTaskReport(TaskReportFilterDTO $filters): array
     {
         // obtenemos las tareas aplicando los filtros de reportes
@@ -32,7 +56,7 @@ class ReportService
                 'status' => $task->getStatus()->value,
                 'priority' => $task->getPriority()->value,
                 'dueDate' => $task->getDueDate()?->format('Y-m-d'),
-                'assignedTo' => $task->getAssignedTo()->getEmail(),
+                'assignedToEmail' => $task->getAssignedTo()->getEmail(),
                 'createdAt' => $task->getCreatedAt()?->format('Y-m-d H:i:s'),
                 'updatedAt' => $task->getUpdatedAt()?->format('Y-m-d H:i:s'),
                 'categories' => array_map(
@@ -68,13 +92,13 @@ class ReportService
             fputcsv($handle, [
                 $row['id'],
                 $row['title'],
-                $row['status'],
-                $row['priority'],
-                $row['dueDate'] ?? '', // si es null lo dejamos vacío
-                $row['assignedTo'],
-                $row['createdAt'] ?? '', // evitamos null en el CSV
-                $row['updatedAt'] ?? '', // evitamos null en el CSV
-                implode(' | ', $row['categories']) // usamos | para no romper el CSV con comas
+                $this->formatStatus($row['status']),
+                $this->formatPriority($row['priority']),
+                $row['dueDate'] ?? '',
+                $row['assignedToEmail'],
+                $row['createdAt'] ?? '',
+                $row['updatedAt'] ?? '',
+                implode(' | ', $row['categories'])
             ]);
         }
 
@@ -120,15 +144,15 @@ class ReportService
         ';
 
         foreach ($data as $row) {
-        $html .= '<tr>
-            <td>'.$row['id'].'</td>
-            <td>'.$this->safe($row['title']).'</td>
-            <td>'.$this->safe($row['status']).'</td>
-            <td>'.$this->safe($row['priority']).'</td>
-            <td>'.$this->safe($row['assignedTo']).'</td>
-            <td>'.$this->safe($row['createdAt']).'</td>
-        </tr>';
-    }
+            $html .= '<tr>
+                <td>'.$row['id'].'</td>
+                <td>'.$this->safe($row['title']).'</td>
+                <td>'.$this->safe($this->formatStatus($row['status'])).'</td>
+                <td>'.$this->safe($this->formatPriority($row['priority'])).'</td>
+                <td>'.$this->safe($row['assignedToEmail']).'</td>
+                <td>'.$this->safe($row['createdAt']).'</td>
+            </tr>';
+        }
 
         $html .= '</tbody></table></body></html>';
 

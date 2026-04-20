@@ -2,19 +2,24 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\Task;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\DTO\TaskReportFilterDTO;
+use Symfony\Bundle\SecurityBundle\Security;
 
 /**
  * @extends ServiceEntityRepository<Task>
  */
 class TaskRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private Security $security; //esto es para poder usar el metodo isGranted
+
+    public function __construct(ManagerRegistry $registry, Security $security)
     {
         parent::__construct($registry, Task::class);
+        $this->security = $security;
     }
 
     //filtros personalizado para posterior getTasks
@@ -24,6 +29,26 @@ class TaskRepository extends ServiceEntityRepository
             ->leftJoin('t.assignedTo', 'u')
             ->leftJoin('t.categories', 'c')
             ->addSelect('u', 'c');
+
+
+        //validar si es rol usuario para filtrar solo las de usuario
+        if (
+            $this->security->isGranted('ROLE_USER') &&
+            !$this->security->isGranted('ROLE_ADMIN')
+        ) {
+            $user = $this->security->getUser();
+
+            if ($user instanceof User) {
+                $qb->andWhere('u.id = :user')
+                    ->setParameter('user', $user->getId());
+            }
+        }
+
+        // búsqueda por título
+        if (!empty($filters['title'])) {
+            $qb->andWhere('LOWER(t.title) LIKE :title')
+            ->setParameter('title', '%' . strtolower($filters['title']) . '%');
+        }
 
         // filtro por status
         if (!empty($filters['status'])) {
@@ -44,14 +69,14 @@ class TaskRepository extends ServiceEntityRepository
         }
 
         // rango de fechas
-        if (!empty($filters['fromDate'])) {
-            $qb->andWhere('t.dueDate >= :fromDate')
-                ->setParameter('fromDate', $filters['fromDate']);
+        if (!empty($filters['dueDateFrom'])) {
+            $qb->andWhere('t.dueDate >= :dueDateFrom')
+                ->setParameter('dueDateFrom', $filters['dueDateFrom']);
         }
 
-        if (!empty($filters['toDate'])) {
-            $qb->andWhere('t.dueDate <= :toDate')
-                ->setParameter('toDate', $filters['toDate']);
+        if (!empty($filters['dueDateTo'])) {
+            $qb->andWhere('t.dueDate <= :dueDateTo')
+                ->setParameter('dueDateTo', $filters['dueDateTo']);
         }
 
         // filtro por fecha de creación desde
@@ -96,6 +121,20 @@ class TaskRepository extends ServiceEntityRepository
             ->addSelect('u')
             ->leftJoin('t.categories', 'c')
             ->addSelect('c');
+
+
+        //validar si es rol usuario para filtrar solo las de usuario
+        if (
+            $this->security->isGranted('ROLE_USER') &&
+            !$this->security->isGranted('ROLE_ADMIN')
+        ) {
+            $user = $this->security->getUser();
+
+            if ($user instanceof User) {
+                $qb->andWhere('u.id = :user')
+                    ->setParameter('user', $user->getId());
+            }
+        }
 
         // filtramos por fecha desde (creación)
         if ($filters->createdFrom) {
